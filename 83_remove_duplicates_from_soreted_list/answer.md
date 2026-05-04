@@ -30,7 +30,7 @@ public:
     }
 };
 ```
-[141.linked list cycle](https://leetcode.com/problems/linked-list-cycle/description/)のようにポインタを二個使う必要はない。
+[141.linked list cycle](https://leetcode.com/problems/linked-list-cycle/description/) のようにポインタを二個使う必要はない。
 むしろnullptrを読むので良くない。あとunordered_setをint型にしないと要素が見れない。
 リストはポインタを格納してるのであってこの状態からfindメソッドの引数としてint型の要素は探せない。
 こういう基本仕様を141やったときに理解しておくような勉強をする必要がある。
