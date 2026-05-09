@@ -1,7 +1,7 @@
 問題：https://leetcode.com/problems/kth-largest-element-in-a-stream/description/
 
 ## step1
-二つ前のスタックの問題の時にそもそもスタックの使い方よくわかっていなかった反省からpriority_queueについても調べた。二分木
+二つ前のスタックの問題の時にそもそもスタックの使い方よくわかっていなかった反省からpriority_queueについても調べた。
 geminiに聞きながら解いたので初見で解くというstep1の意味がなくなってしまった（反省）。
 普通に書くと降順に処理する（.top()で一番大きいものがでてくる）。
 k番目を知りたいので、.top()がk番目であるとよい。つまり、昇順で要素数がk個のpriority_queueを作ればよい。
