@@ -68,5 +68,37 @@ public:
 leetcodeの解答みた。自分が考えるのを逃げてた部分が分かった。
 具体的に言うと昇順に並べられてるという条件について。これってどういうことかと言えば、nums1[n] + nums2[n]は常にnums1[n+1] + nums2[n+1]よりも小さいか同じということです。
 自分としてはk個必要なら最低k回はループ回す必要がある、というような思考で空間O(2k)の方法をしていた。
-ただ不安になるのはnums1[n]+nums2[n+2]がnums1[n+1]+nums2[n+1]より小さいというような場合を見落としてるんじゃないかということ。
-もしこれがn=k-1回目のとこに位置していたら
+不安になったのはnums1[n+1]+nums2[n]がnums1[n]+nums2[n+1]より小さいというような場合を見落としてるんじゃないかということ。
+だからfor文を二回回した。
+
+正解の一つは、nums1[n]+nums2[0]をk個集めたpriority_queueからtop()を取得していくたびにnums1[n]+nums2[1],nums1[n]+nums2[2],というようにnums2の添え字を増やしたものをpriority_queueに追加していく。
+この方のRPを参考にした。
+参考：https://github.com/attractal/leetcode/pull/13/changes
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> kSmallestPairs(vector<int>& nums1, vector<int>& nums2,
+                                       int k) {
+        using tu = tuple<int, int, int>;
+        std::priority_queue<tu, vector<tu>, greater<tu>> sum_to_pair;
+        vector<vector<int>> ans;
+        int j;
+        k < nums1.size() ? j = k : j = nums1.size();
+        for (int i = 1; i <= j; i++) {
+            sum_to_pair.push({nums1[i - 1] + nums2[0], i - 1, 0});
+        }
+        while (!sum_to_pair.empty() && ans.size() < k) {
+            auto [_, idx1, idx2] = sum_to_pair.top();
+            sum_to_pair.pop();
+            ans.push_back({nums1[idx1], nums2[idx2]});
+            if (idx2 + 1 < nums2.size()) {
+                sum_to_pair.push(
+                    {nums1[idx1] + nums2[idx2 + 1], idx1, idx2 + 1});
+            }
+        }
+        return ans;
+    }
+};
+```
+時間計算量がO(klog(min(n, k)))で空間計算量がO(min(n, k))。
