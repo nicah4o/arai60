@@ -146,8 +146,13 @@ public:
 
         i = 1;
         vector<vector<int>> result;
+        pair<int, vector<int>> duplicate;
         while (!sum_to_pair.empty() && i <= k) {
+            if (duplicate == sum_to_pair.top()) {
+                sum_to_pair.pop();
+            }
             result.push_back(sum_to_pair.top().second);
+            duplicate = sum_to_pair.top();
             i++;
             sum_to_pair.pop();
         }
