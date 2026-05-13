@@ -102,3 +102,56 @@ public:
 };
 ```
 時間計算量がO(klog(min(n, k)))で空間計算量がO(min(n, k))。
+
+追記：5/13　最初の試みの改善案
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> kSmallestPairs(vector<int>& nums1, vector<int>& nums2,
+                                       int k) {
+        using pi = pair<int, vector<int>>;
+        bool flag = false;
+        priority_queue<pi, vector<pi>, greater<pi>> sum_to_pair;
+        int i = 1;
+        for (int j : nums1) {
+            for (int k : nums2) {
+                sum_to_pair.push({j + k, {j, k}});
+                i++;
+                if (i == k) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag) {
+                break;
+            }
+        }
+
+        flag = false;
+        i = 1;
+        for (int j : nums2) {
+            for (int k : nums1) {
+                sum_to_pair.push({j + k, {k, j}});
+                i++;
+                if (i == k) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag) {
+                break;
+            }
+        }
+
+        i = 1;
+        vector<vector<int>> result;
+        while (!sum_to_pair.empty() && i <= k) {
+            result.push_back(sum_to_pair.top().second);
+            i++;
+            sum_to_pair.pop();
+        }
+        return result;
+    }
+};
+```
