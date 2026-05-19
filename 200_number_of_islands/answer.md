@@ -54,3 +54,50 @@ public:
 この方のを参考にBFSでもやってみる。
 参考：https://github.com/attractal/leetcode/pull/8/changes
 
+方法としては
+　1.m行n列のbool配列visitedを作る。falseで初期化して上陸したらtrueにする。
+　2.ラムダ式である配列の位置を引数にして、その位置から繋がる島をvisitedにより記録する。
+　3.ラムダ式の中身はBFSつまり最初の位置から上下左右に島がありそれがvisitedでないならキューに積んでゆく。キューがなくなる、つまり島のどの位置の上下左右にも島の続きがない場合にループが終わる（＝島の個数が一つ増える）。
+
+ ```cpp
+class Solution {
+public:
+    int numIslands(vector<vector<char>>& grid) {
+        int island_count = 0;
+        int rows = grid.size();
+        int columns = grid[0].size();
+        vector<vector<bool>> visited(rows, vector<bool>(columns, false));
+        int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        auto visit = [&](int row, int column) {
+            queue<pair<int, int>> islands;
+            visited[row][column] = true;
+            islands.push({row, column});
+            while (!islands.empty()) {
+                auto [row, column] = islands.front();
+                islands.pop();
+                for (int i = 0; i < 4; i++) {
+                    int y = row + directions[i][0];
+                    int x = column + directions[i][1];
+                    if (0 <= y && y < grid.size() && 0 <= x &&
+                        x < grid[0].size() && grid[y][x] == '1' &&
+                        !visited[y][x]) {
+                        islands.push({y, x});
+                        visited[y][x] = true;
+                    }
+                }
+            }
+        };
+        for (int m = 0; m < grid.size(); m++) {
+            for (int n = 0; n < grid[0].size(); n++) {
+                if (grid[m][n] == '1' && !visited[m][n]) {
+                    island_count++;
+                    visit(m, n);
+                }
+            }
+        }
+        return island_count;
+    }
+};
+```
+
+こちらは空間計算量もO(NM)になる。DFSはO(1)になるから問題の性質上走査するのでDFSが望ましいと思う。
