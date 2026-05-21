@@ -135,3 +135,35 @@ public:
 
 参考；https://github.com/Hurukawa2121/leetcode/pull/20
 visitedを使わずともeraseで辞書のハッシュセットから消すこともできる。
+↓erase版
+
+```cpp
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord,
+                     vector<string>& wordList) {
+        unordered_set<string> words(wordList.begin(), wordList.end());
+        queue<pair<string, int>> wordnumq;
+        wordnumq.push({beginWord, 1});
+        while (!wordnumq.empty()) {
+            string word = wordnumq.front().first;
+            int currentnum = wordnumq.front().second;
+            wordnumq.pop();
+            if (word == endWord) {
+                return currentnum;
+            }
+            for (int i = 0; i < word.size(); i++) {
+                string changedword = word;
+                for (char c = 'a'; c <= 'z'; c++) {
+                    changedword[i] = c;
+                    if (words.contains(changedword)) {
+                        wordnumq.push({changedword, currentnum + 1});
+                        words.erase(changedword);
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+};
+```
