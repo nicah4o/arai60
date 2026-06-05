@@ -111,3 +111,98 @@ private:
 
 2^-231 <= Node.val <= 2^231 - 1なのでint型だと判定できない場合のためにlong型を使う。
 
+- https://github.com/YukiMichishita/LeetCode/pull/8/changes
+dequeを使用したbfs,inorderにして単調増加か見る方法など
+これを写させてもらった。
+
+deque使用したbfs
+```cpp
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        deque<tuple<TreeNode*, long, long>> nodes_to_check;
+        nodes_to_check.emplace_back(root, LONG_MIN, LONG_MAX);
+        while (!nodes_to_check.empty()) {
+            auto [node, lower_bound, upper_bound] = nodes_to_check.front();
+            nodes_to_check.pop_front();
+            if (!node)
+                continue;
+            if (!(lower_bound < node->val && upper_bound > node->val)) {
+                return false;
+            }
+            nodes_to_check.emplace_back(node->left, lower_bound, node->val);
+            nodes_to_check.emplace_back(node->right, node->val, upper_bound);
+        }
+        return true;
+    }
+};
+```
+
+stackでのinorder
+```cpp
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        vector<TreeNode*> nodes_to_check;
+        auto append_left_nodes = [&](TreeNode* node) {
+            while (node) {
+                nodes_to_check.push_back(node);
+                node = node->left;
+            }
+        };
+        append_left_nodes(root);
+        long lower_bound = LONG_MIN;
+        while (!nodes_to_check.empty()) {
+            TreeNode* current = nodes_to_check.back();
+            nodes_to_check.pop_back();
+            if (current->val <= lower_bound) {
+                return false;
+            }
+            lower_bound = current->val;
+            if (current->right) {
+                if (current->right->val <= current->val) {
+                    return false;
+                }
+                append_left_nodes(current->right);
+            }
+        }
+        return true;
+    }
+};
+```
+
+再帰でinordered_nodesを作り検証する。
+```cpp
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        vector<TreeNode*> inordered_nodes;
+        inorder_sort(root, inordered_nodes);
+        long prev_val = LONG_MIN;
+        for (TreeNode* node : inordered_nodes) {
+            if (node->val <= prev_val) {
+                return false;
+            }
+            prev_val = node->val;
+        }
+        return true;
+    }
+
+private:
+    void inorder_sort(TreeNode* node, vector<TreeNode*>& nodes) {
+        if (!node)
+            return;
+        if (node->left) {
+            inorder_sort(node->left, nodes);
+        }
+        nodes.push_back(node);
+        if (node->right) {
+            inorder_sort(node->right, nodes);
+        }
+    }
+};
+```
+
+これらをstep3で練習した。
+他にpythonではyieldを使う方法があり、cppでもできるようだ。あまり理解していない。
+- https://github.com/kazukiii/leetcode/pull/29/changes
