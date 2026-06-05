@@ -1,0 +1,96 @@
+```cpp
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        deque<tuple<TreeNode*,long,long>> nodes_to_check;
+        nodes_to_check.emplace_back(root,LONG_MIN,LONG_MAX);
+        while(!nodes_to_check.empty()){
+            auto[node,min,max]=nodes_to_check.front();
+            nodes_to_check.pop_front();
+            if(!node)continue;
+            if(!(min<node->val&&node->val<max)){
+                return false;
+            }
+            if(node->left){
+                nodes_to_check.emplace_back(node->left,min,node->val);
+            }
+            if(node->right){
+                nodes_to_check.emplace_back(node->right,node->val,max);
+            }
+        }
+        return true;
+    }
+};
+```
+
+ifとwhileのスペースがない他、ぶら下がりif、引数スペースなし。
+long型(32byte)はlong long(64byte)にしてもよい。
+continueあるのでnode->left見なくてよい。
+
+```cpp
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        vector<TreeNode*> nodes_to_check;
+        auto left_check = [&](TreeNode* node) {
+            while (node) {
+                nodes_to_check.push_back(node);
+                node=node->left;
+            }
+        };
+        left_check(root);
+        long lower_bound = LONG_MIN;
+        while (!nodes_to_check.empty()) {
+            TreeNode* node = nodes_to_check.back();
+            nodes_to_check.pop_back();
+            if (!node) {
+                continue;
+            }
+            if (node->val <= lower_bound) {
+                return false;
+            }
+            lower_bound = node->val;
+            if (node->right) {
+                left_check(node->right);
+            }
+        }
+        return true;
+    }
+};
+```
+
+代入一つスペースあけてない。
+LONG_MINはstd::numeric_limits<long long>::min)でもよい。
+lower_boundでなくprev_valがよい。
+ラムダ式constつけてもよい。関数なので動詞からはじめてもよい。
+
+```cpp
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        vector<TreeNode*> inordered_nodes;
+        inorder_sort(root,inordered_nodes);
+        long lower_bound = LONG_MIN;
+        for (auto node:inordered_nodes) {
+            if (node->val <= lower_bound) {
+                return false;
+            }
+            lower_bound = node->val;
+        }
+        return true;
+    }
+private:
+    void inorder_sort(TreeNode* node, vector<TreeNode*>& nodes) {
+        if (node->left) {
+            inorder_sort(node->left, nodes);
+        }
+        nodes.push_back(node);
+        if (node->right) {
+            inorder_sort(node->right, nodes);
+        }
+    }
+};
+```
+
+rangedforのnodeをconstつけてもよい。
+ヘルプ関数はnode->left見ずに(!node)でreturnでもよい。
