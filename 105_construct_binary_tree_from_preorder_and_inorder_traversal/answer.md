@@ -97,7 +97,7 @@ public:
 ```
 ・stackには親候補のnodeが入る。つまり、以前のループで子になったnodeたち。
 ・まず、stackの一要素を取り出した時にnode_position < left_limit, left_limit <= node_position < right_limit, right_limit <= node_positionの場合がある。ここでいうnode_positionはinorderでnodeがどこにあるか。
-・一つ目の場合はnodeはstackの要素の左の子になる。二つ目と三つ目の場合は右の子になれるような親がいる場所を探していく。stackを上昇して二つ目の場合が当てはまるような親の右の子になる。
+・一つ目の場合はnodeはstackの要素の左の子になる。二つ目と三つ目の場合は右の子になれるような親がいる場所をstackを遡って探していく。stackをpop_backして二つ目の場合(親のnode_positionより後でかつ親の親のnode_positionよりは前)が当てはまるような親の右の子になる。
 
 inorderの頭からの実装
 ```cpp
